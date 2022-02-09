@@ -3,8 +3,8 @@
 %define devvolk %mklibname %{name} -d
 
 Name:		volk
-Version:	2.4.1
-Release:	%mkrel 1
+Version:	2.5.0
+Release:	1
 Summary:	Vector-Optimized Library of Kernels
 Group:		Communications/Radio
 License:	GPLv3+

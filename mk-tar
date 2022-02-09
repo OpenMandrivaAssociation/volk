@@ -3,9 +3,9 @@
 # $ ./mk-tar
 ########################
 # The git tag to use:
-tag="2.4.1"
+tag="2.5.0"
 # The release suffix to use for the tree root and tar.gz filename: 
-rel="2.4.1"
+rel="2.5.0"
 pkg="volk"
 ########################
 if [[ -d $pkg ]]; then
