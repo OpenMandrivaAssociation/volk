@@ -8,7 +8,7 @@ Release:	1
 Summary:	Vector-Optimized Library of Kernels
 Group:		Communications/Radio
 License:	GPLv3+
-URL:		http://libvolk.org
+URL:		https://libvolk.org
 Source0:	https://github.com/gnuradio/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
 ## NOTE Do not use upstream tarball as it does not include git submodules
 ## NOTE Edit the version in mk-tar script and run it in SOURCES to build tarball
