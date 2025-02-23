@@ -1,21 +1,24 @@
-%define major	2
+%define major	3
 %define libvolk %mklibname %{name} %{major}
 %define devvolk %mklibname %{name} -d
 
 Name:		volk
-Version:	2.5.0
+Version:	3.2.0
 Release:	1
 Summary:	Vector-Optimized Library of Kernels
 Group:		Communications/Radio
-License:	GPLv3+
+License:	LGPL-3.0-or-later
 URL:		https://libvolk.org
 Source0:	https://github.com/gnuradio/%{name}/archive/v%{version}/%{name}-%{version}.tar.gz
-## NOTE Do not use upstream tarball as it does not include git submodules
-## NOTE Edit the version in mk-tar script and run it in SOURCES to build tarball
-Source1:	mk-tar
+## NOTE The upstream tarball includes git submodule cpu_features, however OMLx packages cpu_features separately-
+## NOTE and the VOLK CmakeLists script checks for and prioritise the distro version of cpu_features over the-
+## NOTE included submodule version when supplied via the BuildRequires:cpu_features-devel line below.
+## NOTE This is now the recommended way to handle cpu_features by upstream - https://github.com/gnuradio/volk#missing-submodule
+
 
 BuildRequires:	boost-devel
 BuildRequires:	cmake
+BuildRequires:	cpu_features-devel
 BuildRequires:	doxygen
 BuildRequires:	git
 BuildRequires:	pkgconfig(orc-0.4)
@@ -23,18 +26,13 @@ BuildRequires:	pkgconfig(python3)
 BuildRequires:	python-mako
 BuildRequires:	python-six
 Requires:	%{libvolk} = %{version}-%{release}
+Conflicts:	python-gnuradio < 3.9.0.0
+Conflicts:	gnuradio-devel < 3.9.0.0
 
 %description
 VOLK stands for Vector-Optimized Library of Kernels.
 It is a library that was introduced into GNU Radio in December 2010.
 This is now packaged independently of GNU Radio.
-
-%files
-%{_bindir}/volk_modtool
-%{_bindir}/volk_profile
-%{_bindir}/volk-config-info
-%{_bindir}/list_cpu_features
-%{python3_sitelib}/volk_modtool/
 
 ############################
 %package -n %{libvolk}
@@ -46,9 +44,6 @@ Conflicts:	%{_lib}gnuradio-volk0 < 3.8
 %description -n %{libvolk}
 VOLK stands for Vector-Optimized Library of Kernels.
 It is a library that was introduced into GNU Radio in December 2010.
-
-%files -n %{libvolk}
-%{_libdir}/libvolk.so.%{major}{,.*}
 
 ############################
 %package -n %{devvolk}
@@ -62,13 +57,14 @@ Conflicts:	%{_lib}gnuradio-volk-devel < 3.8
 %description -n %{devvolk}
 This package contains header files needed by developers.
 
-%files -n %{devvolk}
-%{_includedir}/%{name}/
-%{_includedir}/cpu_features/
-%{_libdir}/pkgconfig/volk.pc
-%{_libdir}/libvolk.so
-%{_libdir}/cmake/volk
-%{_libdir}/cmake/CpuFeatures/
+###########################
+%package doc
+Summary:	Documentation files for VOLK
+Requires:	%{name} = %{version}-%{release}
+BuildArch:	noarch
+
+%description doc
+Documentation files for VOLK.
 
 ###########################
 %prep
@@ -80,7 +76,36 @@ This package contains header files needed by developers.
 	-DVOLK_PYTHON_DIR:PATH=%{python_sitelib} \
 	-DENABLE_PROFILING=OFF
 %make_build
+# Build docs
+%make_build volk_doc
 
 %install
 %make_install -C build
-rm %{buildroot}%{_libdir}/*.a
+mkdir -p %{buildroot}%{_docdir}/%{name}/html
+mv %{builddir}/%{name}-%{version}/build/html %{buildroot}%{_docdir}/%{name}/
+
+%files
+%{_bindir}/volk_modtool
+%{_bindir}/volk_profile
+%{_bindir}/volk-config-info
+%{python3_sitelib}/volk_modtool/
+%doc README.md
+%doc docs/CHANGELOG.md
+%exclude %doc %{_docdir}/%{name}/html/*
+%license COPYING
+
+%files -n %{libvolk}
+%{_libdir}/libvolk.so.%{major}{,.*}
+
+
+%files -n %{devvolk}
+%{_includedir}/%{name}/
+%{_libdir}/pkgconfig/volk.pc
+%{_libdir}/libvolk.so
+%{_libdir}/cmake/volk
+
+%files doc
+%doc %{_docdir}/%{name}/README.md
+%doc %{_docdir}/%{name}/html/*
+
+%changelog
