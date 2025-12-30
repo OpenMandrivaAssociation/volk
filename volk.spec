@@ -4,7 +4,7 @@
 
 Name:		volk
 Version:	3.2.0
-Release:	1
+Release:	2
 Summary:	Vector-Optimized Library of Kernels
 Group:		Communications/Radio
 License:	LGPL-3.0-or-later
