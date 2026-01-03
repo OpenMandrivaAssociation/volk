@@ -1,0 +1,6 @@
+# Spurious locales error on docs package
+addFilter("no-dependency-on locales-")
+# Docs are provided by packages own html docs
+addFilter("no-manual-page-for-binary volk-config-info")
+addFilter("no-manual-page-for-binary volk_modtool")
+addFilter("no-manual-page-for-binary volk_profile")

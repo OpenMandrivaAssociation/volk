@@ -18,8 +18,10 @@ Source0:	https://github.com/gnuradio/%{name}/archive/v%{version}/%{name}-%{versi
 
 BuildRequires:	boost-devel
 BuildRequires:	cmake
+BuildRequires:	ninja
 BuildRequires:	cpu_features-devel
 BuildRequires:	doxygen
+BuildRequires:	fdupes
 BuildRequires:	git
 BuildRequires:	pkgconfig(orc-0.4)
 BuildRequires:	pkgconfig(python3)
@@ -70,19 +72,27 @@ Documentation files for VOLK.
 %prep
 %autosetup -p1
 
+# fix shebangs
+pushd python/volk_modtool
+sed -i '1 {/#!\s*\/usr\/bin\/env\s\+python/ d}' __init__.py cfg.py volk_modtool_generate.py
+popd
+
 %build
 %cmake \
 	-DPYTHON_EXECUTABLE=%{__python} \
 	-DVOLK_PYTHON_DIR:PATH=%{python_sitelib} \
-	-DENABLE_PROFILING=OFF
-%make_build
+	-DENABLE_PROFILING=OFF \
+	-G Ninja
+%ninja_build
 # Build docs
-%make_build volk_doc
+%ninja_build volk_doc
 
 %install
-%make_install -C build
+%ninja_install -C build
 mkdir -p %{buildroot}%{_docdir}/%{name}/html
 mv %{builddir}/%{name}-%{version}/build/html %{buildroot}%{_docdir}/%{name}/
+
+%fdupes %{buildroot}/%{_prefix}
 
 %files
 %{_bindir}/volk_modtool
@@ -107,5 +117,3 @@ mv %{builddir}/%{name}-%{version}/build/html %{buildroot}%{_docdir}/%{name}/
 %files doc
 %doc %{_docdir}/%{name}/README.md
 %doc %{_docdir}/%{name}/html/*
-
-%changelog
