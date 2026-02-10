@@ -3,8 +3,8 @@
 %define devvolk %mklibname %{name} -d
 
 Name:		volk
-Version:	3.2.0
-Release:	2
+Version:	3.3.0
+Release:	1
 Summary:	Vector-Optimized Library of Kernels
 Group:		Communications/Radio
 License:	LGPL-3.0-or-later
@@ -24,9 +24,8 @@ BuildRequires:	doxygen
 BuildRequires:	fdupes
 BuildRequires:	git
 BuildRequires:	pkgconfig(orc-0.4)
-BuildRequires:	pkgconfig(python3)
-BuildRequires:	python-mako
-BuildRequires:	python-six
+BuildRequires:	pkgconfig(python)
+BuildRequires:	python%{pyver}dist(mako)
 Requires:	%{libvolk} = %{version}-%{release}
 Conflicts:	python-gnuradio < 3.9.0.0
 Conflicts:	gnuradio-devel < 3.9.0.0
@@ -42,6 +41,7 @@ Summary:	Volk libraries
 Group:		System/Libraries
 Obsoletes:	%{_lib}gnuradio-volk0 < 3.8
 Conflicts:	%{_lib}gnuradio-volk0 < 3.8
+%rename %{_lib}%{name}2
 
 %description -n %{libvolk}
 VOLK stands for Vector-Optimized Library of Kernels.
@@ -55,6 +55,7 @@ Requires:	%{libvolk} = %{version}-%{release}
 Provides:	%{name}-devel = %{version}-%{release}
 Obsoletes:	%{_lib}gnuradio-volk-devel < 3.8
 Conflicts:	%{_lib}gnuradio-volk-devel < 3.8
+Conflicts:	vulkan-volk-devel
 
 %description -n %{devvolk}
 This package contains header files needed by developers.
@@ -79,9 +80,10 @@ popd
 
 %build
 %cmake \
-	-DPYTHON_EXECUTABLE=%{__python} \
+	-DPYTHON_EXECUTABLE=%{__python3} \
 	-DVOLK_PYTHON_DIR:PATH=%{python_sitelib} \
 	-DENABLE_PROFILING=OFF \
+	-DENABLE_TESTING=ON \
 	-G Ninja
 %ninja_build
 # Build docs
@@ -94,11 +96,16 @@ mv %{builddir}/%{name}-%{version}/build/html %{buildroot}%{_docdir}/%{name}/
 
 %fdupes %{buildroot}/%{_prefix}
 
+%check
+# Exclude test that reportedly fails in CI: https://github.com/gnuradio/volk/issues/794
+ctest --test-dir build --output-on-failure \
+    -E "qa_volk_32fc_s32fc_rotator2puppet_32fc"
+
 %files
 %{_bindir}/volk_modtool
 %{_bindir}/volk_profile
 %{_bindir}/volk-config-info
-%{python3_sitelib}/volk_modtool/
+%{python_sitelib}/volk_modtool/
 %doc README.md
 %doc docs/CHANGELOG.md
 %exclude %doc %{_docdir}/%{name}/html/*
