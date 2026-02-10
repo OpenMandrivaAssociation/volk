@@ -23,6 +23,7 @@ BuildRequires:	cpu_features-devel
 BuildRequires:	doxygen
 BuildRequires:	fdupes
 BuildRequires:	git
+BuildRequires:	pkgconfig(fmt)
 BuildRequires:	pkgconfig(orc-0.4)
 BuildRequires:	pkgconfig(python)
 BuildRequires:	python%{pyver}dist(mako)
