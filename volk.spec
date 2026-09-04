@@ -80,6 +80,8 @@ sed -i '1 {/#!\s*\/usr\/bin\/env\s\+python/ d}' __init__.py cfg.py volk_modtool_
 popd
 
 %build
+# fmt 12 no longer pulls format() in via fmt/core.h
+export CXXFLAGS="${CXXFLAGS:-%{optflags}} -DFMT_DEPRECATED_HEAVY_CORE"
 %cmake \
 	-DPYTHON_EXECUTABLE=%{__python3} \
 	-DVOLK_PYTHON_DIR:PATH=%{python_sitelib} \
