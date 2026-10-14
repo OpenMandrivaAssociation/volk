@@ -4,7 +4,7 @@
 
 Name:		volk
 Version:	3.3.0
-Release:	2
+Release:	3
 Summary:	Vector-Optimized Library of Kernels
 Group:		Communications/Radio
 License:	LGPL-3.0-or-later
@@ -25,7 +25,7 @@ BuildRequires:	fdupes
 BuildRequires:	git
 BuildRequires:	pkgconfig(fmt)
 BuildRequires:	pkgconfig(orc-0.4)
-BuildRequires:	pkgconfig(python)
+BuildRequires:	pkgconfig(python3)
 BuildRequires:	python%{pyver}dist(mako)
 Requires:	%{libvolk} = %{version}-%{release}
 Conflicts:	python-gnuradio < 3.9.0.0
@@ -83,7 +83,7 @@ popd
 # fmt 12 no longer pulls format() in via fmt/core.h
 export CXXFLAGS="${CXXFLAGS:-%{optflags}} -DFMT_DEPRECATED_HEAVY_CORE"
 %cmake \
-	-DPYTHON_EXECUTABLE=%{__python3} \
+	-DPYTHON_EXECUTABLE=%{__python} \
 	-DVOLK_PYTHON_DIR:PATH=%{python_sitelib} \
 	-DENABLE_PROFILING=OFF \
 	-DENABLE_TESTING=ON \
